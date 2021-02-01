@@ -1,0 +1,153 @@
+{% extends '../base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load filters %}
+
+{%block page_title%}
+Manage Sale Details
+{% endblock%}
+{% block right_button%}
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-add-sale">
+    New Sale Item
+</button>
+{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <!-- ./row -->
+    <div class="row">
+        <!-- ./col -->
+        <div class="col-12">
+            <div class="card">
+                {%if sale_items%}
+                <!-- ./ card-header -->
+                <div class="card-header">
+                    <h3 class="card-title">Sales Items</h3>
+                </div>
+                <!-- /.card-header -->
+                <!-- ./card-body -->
+                <div class="card-body">
+                    Sale Info
+                    <table id="" border="1" cellpadding="5" class="table table-bordered">
+                        <tr>
+                             <th>Date</th>
+                            <td>{{sale.sales_date}}</td>
+                            <th>Customer</th>
+                            <td>{{sale.client}}</td>
+                            <th>Total QTY</th>
+                            <td>{{sale.total_quantity}}</td>
+                            <th>Total Amount</th>
+                            <td>{{sale.total_amount}}</td>
+                        </tr>
+                    </table>
+                    <hr>
+                    <table id="sales_items_table" class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Livestock</th>
+                            <th>Farm</th>
+                            <th>Quantity</th>
+                            <th>Rate</th>
+                            <th>Amount</th>
+                            <th>#</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for sale in sale_items%}
+                        <tr data-id={{sale.id}}>
+                            <td>{{sale.id}}</td>
+                            <td>{{sale.livestock}}</td>
+                            <td>{{sale.farm}}</td>
+                            <td>{{sale.id|total_sale_qty_filter}} (M-{{sale.male}}, F-{{sale.female}})</td>
+                            <td>{{sale.rate}}</td>
+                            <td>{{sale.amount}}</td>
+                            <td>
+                                <a href="{% url 'edit_death' sale.id %}" style="color:inherit">
+                                    <i class="fa fa-edit"></i>
+                                </a> |
+                                <a href="{% url 'delete_death' sale.id %}" style="color: inherit">
+                                    <i class="fa fa-trash" onclick="return 'Do you want to delete this record?'"></i>
+                                </a>
+                            <td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.card-body -->
+                {%else%}
+                <div class="card-body">
+                    <h4>No Sale Item available</h4>
+                </div>
+                {%endif%}
+            </div>
+            <!-- /.card -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.container-fluid -->
+
+<div class="modal fade" id="modal-add-sale">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add New Sale Item</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ sale_item_form|crispy }}
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+                </form>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<!-- Confirm Submit -->
+<div class="modal fade" id="modal-confirm-submit">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Confirm Submit</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to submit this Wagesheet?
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Dismiss</button>
+                <button type="submit" class="btn btn-success">Confirm</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<!-- DataTables -->
+<script src="{% static 'plugins/datatables/jquery.dataTables.min.js'%}"></script>
+<script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js'%}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js'%}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/responsive.bootstrap4.min.js'%}"></script>
+
+<!-- page script -->
+<script>
+    $("#sales_items_table").DataTable({
+    });
+</script>
+{% endblock content %}
